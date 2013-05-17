@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<style type="text/css">
+@import url("http://ajax.googleapis.com/ajax/libs/dojo/1.3.1/dojo/resources/dojo.css");
+@import url("http://ajax.googleapis.com/ajax/libs/dojo/1.3.1/dijit/themes/tundra/tundra.css");
+@import url("http://ajax.googleapis.com/ajax/libs/dojo/1.3.1/dojox/grid/resources/Grid.css");
+@import url("http://ajax.googleapis.com/ajax/libs/dojo/1.3.1/dojox/grid/resources/tundraGrid.css");
+@import url("http://ajax.googleapis.com/ajax/libs/dojo/1.3.1/dojox/layout/resources/FloatingPane.css");
+@import url("http://ajax.googleapis.com/ajax/libs/dojo/1.3.1/dojox/layout/resources/ResizeHandle.css");
+</style>
+
+<script>
+	var googleMapsKey = "ABQIAAAAUSQ19DnbWFmnXLrOTDG68hTTjCFvGjGajWGTkLriX3JhBGv2axToAF_mK2vhtBeG_UafgTi5qXybag";
+	var scriptTag = '<' + 'script src="http://maps.google.com/maps?file=api&v=2&key=' + googleMapsKey + '">'+'<'+'/script>';
+	document.write(scriptTag);
+</script>
+
+<script type="text/javascript"
+  		src="http://ajax.googleapis.com/ajax/libs/dojo/1.3.1/dojo/dojo.xd.js"
+		djConfig="isDebug: false, parseOnLoad: true"></script>
+
+<script type="text/javascript">
+dojo.require("dojox.layout.FloatingPane"); 
+
+function createFloatingPane(divId, title, x, y, width, height) {
+	var pane = new dojox.layout.FloatingPane({  
+		'title': title,
+		'id': divId + "_floater",
+		'closeable': true,
+		'resizable': true,
+		'dockable': false
+	}, divId);
+	
+	// quick fix for positioning, does not seem necessary in source code
+	// example (FloatingPane test), but was necessary with dojo bin and
+	// Firefox 3.0.1
+	pane.domNode.style.left = x + "px";
+	pane.domNode.style.top = y + "px";
+	pane.resize({ 'w': width, 'h': height });
+	
+	pane.startup(); 
+	
+	return pane;
+}
+
+function load() { 
+	var floatingPane = 
+			createFloatingPane("map_container", "Map", 10, 10, 400, 500);
+
+    if (GBrowserIsCompatible()) {
+		var mapElement = dojo.byId("map");
+        var map = new GMap2(mapElement);
+		map.addControl(new GLargeMapControl());
+	 	map.addControl(new GMapTypeControl());
+        map.setCenter(new GLatLng(48.44673890596188, -123.38882446289062), 12);
+ 
+		map.enableScrollWheelZoom();
+		map.setMapType(G_HYBRID_MAP);
+
+		function resize() {
+			map.checkResize();
+		}
+		
+		dojo.connect(floatingPane,"resize", resize);
+		
+	}	
+}
+  
+dojo.addOnLoad(load);
+  
+</script>
+
+</head>
+
+<body class="tundra" onunload="GUnload()">
+
+<div id="map_container">
+<div id="map" style="width:100%;height:100%;"></div>
+</div>
+
+</body></html>
